@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://diuyon.github.io</id>
     <title>Gridea</title>
-    <updated>2021-12-28T03:27:03.931Z</updated>
+    <updated>2021-12-28T03:44:42.193Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://diuyon.github.io"/>
     <link rel="self" href="https://diuyon.github.io/atom.xml"/>
@@ -10,6 +10,42 @@
     <logo>https://diuyon.github.io/images/avatar.png</logo>
     <icon>https://diuyon.github.io/favicon.ico</icon>
     <rights>All rights reserved 2021, Gridea</rights>
+    <entry>
+        <title type="html"><![CDATA[代码设计技巧]]></title>
+        <id>https://diuyon.github.io/post/dai-ma-she-ji-ji-qiao/</id>
+        <link href="https://diuyon.github.io/post/dai-ma-she-ji-ji-qiao/">
+        </link>
+        <updated>2021-12-28T03:43:18.000Z</updated>
+        <content type="html"><![CDATA[<p>[TOC]</p>
+<h2 id="前言">前言</h2>
+<p>这篇文章是平时阅读代码时带来的思考总结，写的很杂，标题之前没有顺序可言，闲来无事看看就好。</p>
+<h2 id="设计结构">设计结构</h2>
+<h3 id="211226">21/12/26</h3>
+<h4 id="前提">前提</h4>
+<p>今天看grpc代码看到一种写法，前提是这样：每次进行一次RPC方法调用时，都会有统计去记录类死这一次调用的方法是那个，用时多久等信息。</p>
+<h4 id="结构">结构</h4>
+<p>它使用的写法是，定义了一个用于接收统计信息的回调接口Handler，接口从配置里面拿，如果拿到接口不为nil则进行统计。具体接口有以下方法：</p>
+<ol>
+<li>
+<p>TagRPC，接受基本信息，调用的方法名，是否允许重试；</p>
+</li>
+<li>
+<p>HandleRPC，接受统计信息，这个统计信息是个入参，类型是一个接口；</p>
+</li>
+<li>
+<ol>
+<li>是否为客户端侧，即统计信息是否始于客户端；</li>
+</ol>
+</li>
+</ol>
+<p>实现统计信息接口的类型是RPC定义好的，不能自定义通过配置传入，其类型有：Begin（记录连接开始的相关信息），End，IsPayload（如果携带信息，则会通过这个类型记录信息的基本信息，如长度、压缩类型等），等。</p>
+<p>这些类型都在代码固定位置写好了，在远程调用开始前会调用Begin，IsPayload，在远程调用结束后调用End，如果配置文件里的Handler不为空的话，这些信息都会通过Handel.HandleRPC传回去。</p>
+<h4 id="思考">思考</h4>
+<p>我认为比较巧妙的是接收统计信息这块。统计哪些信息的行为是内部定义好的，不能通过外部定义，外部只需要定义这些信息的处理行为即可，保证了代码的整洁、干净。</p>
+<p>内部定义的这些信息缺少用户想要的怎么办？这种结构遇到这种情况不就不灵活了。的确这种结构会出现这种情况，想要新增统计的信息类型只能等下次更新了。这种情况对某些用户来讲是好的，也是坏的，这就看使用场景了。</p>
+<p>第二个比较巧妙的点是，所有的统计信息都被抽离出一个公共方法，IsClientConn()，这些公共方法被整理成一个接口传入HandleRPC中，用户使用HandleRPC的方式是通过Switch v := stat.(type) 来区分并还原统计类型，拿到其自己的属性。</p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Hello Gridea]]></title>
         <id>https://diuyon.github.io/post/hello-gridea/</id>

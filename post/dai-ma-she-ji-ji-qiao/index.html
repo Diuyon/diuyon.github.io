@@ -2,24 +2,23 @@
   <head>
     <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hello Gridea | Gridea</title>
+<title>代码设计技巧 | Gridea</title>
 <link rel="shortcut icon" href="https://diuyon.github.io/favicon.ico?v=1640663077840">
 <link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
 <link rel="stylesheet" href="https://diuyon.github.io/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="Hello Gridea | Gridea - Atom Feed" href="https://diuyon.github.io/atom.xml">
+<link rel="alternate" type="application/atom+xml" title="代码设计技巧 | Gridea - Atom Feed" href="https://diuyon.github.io/atom.xml">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
 
 
 
-    <meta name="description" content="👏  欢迎使用 Gridea ！
-✍️  Gridea 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...
-
-Github
-Gridea 主页
-示例网站
-特性👇
-📝  你可以使用最酷的 Markdo..." />
-    <meta name="keywords" content="Gridea" />
+    <meta name="description" content="[TOC]
+前言
+这篇文章是平时阅读代码时带来的思考总结，写的很杂，标题之前没有顺序可言，闲来无事看看就好。
+设计结构
+21/12/26
+前提
+今天看grpc代码看到一种写法，前提是这样：每次进行一次RPC方法调用时，都会有统计去记录类死这..." />
+    <meta name="keywords" content="" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
     <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
@@ -81,54 +80,66 @@ Gridea 主页
         <div class="post-detail">
           <article class="post">
             <h2 class="post-title">
-              Hello Gridea
+              代码设计技巧
             </h2>
             <div class="post-info">
               <span>
-                2018-12-12
+                2021-12-28
               </span>
               <span>
-                2 min read
+                3 min read
               </span>
-              
-                <a href="https://diuyon.github.io/tag/tHD_5KYMn/" class="post-tag">
-                  # Gridea
-                </a>
               
             </div>
             
-              <img class="post-feature-image" src="https://diuyon.github.io/post-images/hello-gridea.png" alt="">
-            
             <div class="post-content-wrapper">
               <div class="post-content">
-                <p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
-<!-- more -->
-<p><a href="https://github.com/getgridea/gridea">Github</a><br>
-<a href="https://gridea.dev/">Gridea 主页</a><br>
-<a href="http://fehey.com/">示例网站</a></p>
-<h2 id="特性">特性👇</h2>
-<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
-<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
-<p>🏷️  你可以对文章进行标签分组</p>
-<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
-<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
-<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
-<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
-<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
-<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
-<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
-<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
-<p>未来，它一定会成为你离不开的伙伴</p>
-<p>尽情发挥你的才华吧！</p>
-<p>😘 Enjoy~</p>
+                <p>[TOC]</p>
+<h2 id="前言">前言</h2>
+<p>这篇文章是平时阅读代码时带来的思考总结，写的很杂，标题之前没有顺序可言，闲来无事看看就好。</p>
+<h2 id="设计结构">设计结构</h2>
+<h3 id="211226">21/12/26</h3>
+<h4 id="前提">前提</h4>
+<p>今天看grpc代码看到一种写法，前提是这样：每次进行一次RPC方法调用时，都会有统计去记录类死这一次调用的方法是那个，用时多久等信息。</p>
+<h4 id="结构">结构</h4>
+<p>它使用的写法是，定义了一个用于接收统计信息的回调接口Handler，接口从配置里面拿，如果拿到接口不为nil则进行统计。具体接口有以下方法：</p>
+<ol>
+<li>
+<p>TagRPC，接受基本信息，调用的方法名，是否允许重试；</p>
+</li>
+<li>
+<p>HandleRPC，接受统计信息，这个统计信息是个入参，类型是一个接口；</p>
+</li>
+<li>
+<ol>
+<li>是否为客户端侧，即统计信息是否始于客户端；</li>
+</ol>
+</li>
+</ol>
+<p>实现统计信息接口的类型是RPC定义好的，不能自定义通过配置传入，其类型有：Begin（记录连接开始的相关信息），End，IsPayload（如果携带信息，则会通过这个类型记录信息的基本信息，如长度、压缩类型等），等。</p>
+<p>这些类型都在代码固定位置写好了，在远程调用开始前会调用Begin，IsPayload，在远程调用结束后调用End，如果配置文件里的Handler不为空的话，这些信息都会通过Handel.HandleRPC传回去。</p>
+<h4 id="思考">思考</h4>
+<p>我认为比较巧妙的是接收统计信息这块。统计哪些信息的行为是内部定义好的，不能通过外部定义，外部只需要定义这些信息的处理行为即可，保证了代码的整洁、干净。</p>
+<p>内部定义的这些信息缺少用户想要的怎么办？这种结构遇到这种情况不就不灵活了。的确这种结构会出现这种情况，想要新增统计的信息类型只能等下次更新了。这种情况对某些用户来讲是好的，也是坏的，这就看使用场景了。</p>
+<p>第二个比较巧妙的点是，所有的统计信息都被抽离出一个公共方法，IsClientConn()，这些公共方法被整理成一个接口传入HandleRPC中，用户使用HandleRPC的方式是通过Switch v := stat.(type) 来区分并还原统计类型，拿到其自己的属性。</p>
 
               </div>
               <div class="toc-container">
                 <ul class="markdownIt-TOC">
 <li>
 <ul>
-<li><a href="#%E7%89%B9%E6%80%A7">特性👇</a></li>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E8%AE%BE%E8%AE%A1%E7%BB%93%E6%9E%84">设计结构</a>
+<ul>
+<li><a href="#211226">21/12/26</a>
+<ul>
+<li><a href="#%E5%89%8D%E6%8F%90">前提</a></li>
+<li><a href="#%E7%BB%93%E6%9E%84">结构</a></li>
+<li><a href="#%E6%80%9D%E8%80%83">思考</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -138,6 +149,15 @@ Gridea 主页
           </article>
         </div>
 
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://diuyon.github.io/post/hello-gridea/">
+              <h3 class="post-title">
+                Hello Gridea
+              </h3>
+            </a>
+          </div>
         
 
         
