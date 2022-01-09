@@ -1,0 +1,220 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mysql 的存储单位 | Gridea</title>
+<link rel="shortcut icon" href="https://diuyon.github.io/favicon.ico?v=1641736872417">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://diuyon.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="Mysql 的存储单位 | Gridea - Atom Feed" href="https://diuyon.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="Mysql 的存储单位
+
+参考：https://baijiahao.baidu.com/s?id=1704133000001183696&amp;wfr=spider&amp;for=pc
+
+[TOC]
+每种存储系统都有自己的存储单位
+
+数..." />
+    <meta name="keywords" content="mysql" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://diuyon.github.io">
+  <img class="avatar" src="https://diuyon.github.io/images/avatar.png?v=1641736872417" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              Mysql 的存储单位
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-01-09
+              </span>
+              <span>
+                2 min read
+              </span>
+              
+                <a href="https://diuyon.github.io/tag/EHjkd8k46/" class="post-tag">
+                  # mysql
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="mysql-的存储单位">Mysql 的存储单位</h1>
+<blockquote>
+<p>参考：https://baijiahao.baidu.com/s?id=1704133000001183696&amp;wfr=spider&amp;for=pc</p>
+</blockquote>
+<p>[TOC]</p>
+<p>每种存储系统都有自己的存储单位</p>
+<ul>
+<li>数据持久化存储磁盘里，磁盘的最小单元是扇区，一个扇区的大小是 512个字节。</li>
+<li>文件系统的最小单元是块，一个块的大小是 4K。</li>
+<li><strong>InnoDB 存储引擎，有自己的最小单元，称之为页，一个页的大小是 16K。</strong></li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://pics7.baidu.com/feed/9c16fdfaaf51f3de4c79ec71eff64e173b2979f9.png?token=a2a81ccb25105b604dcca3781ff8346d" alt="img" loading="lazy"></figure>
+<p>Mysql 每次读取都是以存储单位去读取，每读取一页就代表一次IO。假如一行数据大小为 1K，那么一次IO就能读取 16K/1K = 16 行数据。</p>
+<h3 id="mysql-查看存储单位大小">Mysql 查看存储单位大小</h3>
+<pre><code class="language-sql">show variables like 'innodb_page_size';
+</code></pre>
+<h3 id="mysql-一张表最多能存放多少行数据">Mysql 一张表最多能存放多少行数据</h3>
+<p>Mysql 为了加快查询速度，会自动为每张表创建一个<strong>聚簇索引</strong>。同样的聚簇索引代表一个 B+树，其<strong>树的每个节点代表一页</strong>。</p>
+<p>我们从根节点开始算，一个节点存储了一个由（主键，指针）组成的数组，主键的类型为 bigint，大小为 8B(64bit)，Mysql 指针大小为 6B，即一个数组元素大小为 8+6=14B，那一个节点存储的数组长度为 16KB/14B=1170，即一个节点最多可容纳1170个子节点。</p>
+<p>Mysql 官方建议一个B+树高度不要超过3，那么高度为3的 B+树能包含 1170 * 1170 个叶子节点。假设现表一行数据量为 1K，那么一个叶子节点可容纳 16 行数据（叶子节点也有指针，但是和1K的数据量比起来可以忽略），那么最后一张表可以包含 1170 * 1170 * 16 = 21902400 行数据。</p>
+<h3 id="如何计算当前表能存放多少数据">如何计算当前表能存放多少数据</h3>
+<p><strong>查看当前表的状态信息</strong></p>
+<pre><code class="language-sql">show table status like 'haha_table'\G
+</code></pre>
+<p>其中 <code>Avg_row_length</code> 代表当前表每行的平均大小，单位B。</p>
+<p><strong>查看表信息</strong></p>
+<pre><code class="language-sql">desc haha_table;
+</code></pre>
+<p>查看主键大小。</p>
+<p>计算结果：(16<em>1024 B / Avg_row_length B) * (16</em>1024 B / primary_key_length B) * (leve - 1)</p>
+<ul>
+<li>Avg_row_length 每行数据大小</li>
+<li>primary_key_length 主键大小</li>
+<li>level 树高度</li>
+</ul>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#mysql-%E7%9A%84%E5%AD%98%E5%82%A8%E5%8D%95%E4%BD%8D">Mysql 的存储单位</a><br>
+*
+<ul>
+<li><a href="#mysql-%E6%9F%A5%E7%9C%8B%E5%AD%98%E5%82%A8%E5%8D%95%E4%BD%8D%E5%A4%A7%E5%B0%8F">Mysql 查看存储单位大小</a></li>
+<li><a href="#mysql-%E4%B8%80%E5%BC%A0%E8%A1%A8%E6%9C%80%E5%A4%9A%E8%83%BD%E5%AD%98%E6%94%BE%E5%A4%9A%E5%B0%91%E8%A1%8C%E6%95%B0%E6%8D%AE">Mysql 一张表最多能存放多少行数据</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E5%BD%93%E5%89%8D%E8%A1%A8%E8%83%BD%E5%AD%98%E6%94%BE%E5%A4%9A%E5%B0%91%E6%95%B0%E6%8D%AE">如何计算当前表能存放多少数据</a></li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://diuyon.github.io/post/dai-ma-she-ji-ji-qiao/">
+              <h3 class="post-title">
+                代码设计技巧
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://diuyon.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

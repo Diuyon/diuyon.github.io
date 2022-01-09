@@ -1,0 +1,249 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>B树和B+树 | Gridea</title>
+<link rel="shortcut icon" href="https://diuyon.github.io/favicon.ico?v=1641736872417">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://diuyon.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="B树和B+树 | Gridea - Atom Feed" href="https://diuyon.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="B树和B+树
+[TOC]
+
+参考：B树、B+树详解
+
+前言
+B+ 树是一种存储结构，常用在数据库建立索引。
+准备知识
+m阶的树：树最大分叉有m个，即子节点数最大为m个；
+根节点：没有父节点的节点；
+叶节点：没有子节点的节点；
+内部节点：不是..." />
+    <meta name="keywords" content="B+树,mysql" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://diuyon.github.io">
+  <img class="avatar" src="https://diuyon.github.io/images/avatar.png?v=1641736872417" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              B树和B+树
+            </h2>
+            <div class="post-info">
+              <span>
+                2022-01-09
+              </span>
+              <span>
+                3 min read
+              </span>
+              
+                <a href="https://diuyon.github.io/tag/3DAVUxKiN/" class="post-tag">
+                  # B+树
+                </a>
+              
+                <a href="https://diuyon.github.io/tag/EHjkd8k46/" class="post-tag">
+                  # mysql
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <h1 id="b树和b树">B树和B+树</h1>
+<p>[TOC]</p>
+<blockquote>
+<p>参考：<a href="https://www.cnblogs.com/lianzhilei/p/11250589.html#!comments">B树、B+树详解</a></p>
+</blockquote>
+<h2 id="前言">前言</h2>
+<p>B+ 树是一种存储结构，常用在数据库建立索引。</p>
+<p><strong>准备知识</strong></p>
+<p>m阶的树：树最大分叉有m个，即子节点数最大为m个；</p>
+<p>根节点：没有父节点的节点；</p>
+<p>叶节点：没有子节点的节点；</p>
+<p>内部节点：不是根、叶节点的节点；</p>
+<p>二叉搜索树：左子树中的值要比根节点值 <strong>小</strong>，右子树中的值要比根节点值 <strong>大</strong>；</p>
+<p>平衡二叉树：二叉搜索树的特殊情况，左右子树<strong>高度</strong>一样；</p>
+<h2 id="一-b树">一、B树</h2>
+<p>B数是平衡<strong>多</strong>叉树，一个m阶的B树，有如下特性：</p>
+<ol>
+<li><strong>内部节点最少得有ceil(m/2)个子节点；</strong></li>
+<li>根节点不是叶节点时，至少得有2个子节点，即2阶；</li>
+<li><strong>m阶的节点中包含m-1个数据</strong>；</li>
+<li>所有叶子节点高度一致；</li>
+</ol>
+<figure data-type="image" tabindex="1"><img src="https://segmentfault.com/img/bVcSjVg" alt="B树结构" loading="lazy"></figure>
+<h2 id="二-b树">二、B+树</h2>
+<p>B+树是B树变体，对其规则做了些改变。改变如下：</p>
+<ol>
+<li>叶子结点由一个有序数组和指向其右边一个叶子结点的指针组成；</li>
+<li>非叶子节点由一个有序数组组成，但是数组元素由一个<strong>索引值</strong>一个指针组成；
+<ol>
+<li>指针：指向一个叶子节点；</li>
+<li>索引值：指向的那个叶子节点中最小的索引值；</li>
+</ol>
+</li>
+<li>非叶节点，是工具节点，用于快速找到指定叶节点，只有叶节点才存储真正的数据（一行数据）；</li>
+<li>叶子<strong>节点们</strong>类似一个有序链表;</li>
+<li>m阶的节点中包含m个数据;</li>
+</ol>
+<figure data-type="image" tabindex="2"><img src="https://segmentfault.com/img/bVcSjVi" alt="B+树结构" loading="lazy"></figure>
+<p>注：mysql B+树的叶子结点是一个双链表，且尾部叶子节点还指向头部叶子节点。</p>
+<h3 id="21-为什么b树适合数据库">2.1 为什么B+树适合数据库？</h3>
+<ol>
+<li>B+树便于范围查询，这是最主要的。</li>
+</ol>
+<p>只需要查找最左边范围即可，查到后遍历往右遍历叶子结点，知道碰到右边范围结束，这样就筛出了所有范围内数据。</p>
+<p>B树的范围查找用的是中序遍历，而B+树用的是在链表上遍历；</p>
+<ol start="2">
+<li>B+树的磁盘读写代价更低。</li>
+</ol>
+<p>Mysql最小存储单位为页，每次访问数据都是一页一页加载（访问一页就是一次IO），Mysql的索引树建立自然就是以页为单位，即一个节点就是一页。由于B+树在非叶子节点仅存储索引数据，那么读一页数据，即一次性读入内存中的需要查找的关键字也就越多，相对来说IO读写次数也就降低了；</p>
+<ol start="3">
+<li>B+树查询效率更加稳定</li>
+</ol>
+<p>由于非叶子节点并不是最终指向文件内容的结点，所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当；</p>
+
+              </div>
+              <div class="toc-container">
+                <ul class="markdownIt-TOC">
+<li><a href="#b%E6%A0%91%E5%92%8Cb%E6%A0%91">B树和B+树</a>
+<ul>
+<li><a href="#%E5%89%8D%E8%A8%80">前言</a></li>
+<li><a href="#%E4%B8%80-b%E6%A0%91">一、B树</a></li>
+<li><a href="#%E4%BA%8C-b%E6%A0%91">二、B+树</a>
+<ul>
+<li><a href="#21-%E4%B8%BA%E4%BB%80%E4%B9%88b%E6%A0%91%E9%80%82%E5%90%88%E6%95%B0%E6%8D%AE%E5%BA%93">2.1 为什么B+树适合数据库？</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://diuyon.github.io/post/mysql-de-cun-chu-dan-wei/">
+              <h3 class="post-title">
+                Mysql 的存储单位
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://diuyon.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

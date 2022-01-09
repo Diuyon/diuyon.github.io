@@ -2,14 +2,118 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://diuyon.github.io</id>
     <title>Gridea</title>
-    <updated>2021-12-28T07:11:26.270Z</updated>
+    <updated>2022-01-09T14:02:10.246Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://diuyon.github.io"/>
     <link rel="self" href="https://diuyon.github.io/atom.xml"/>
     <subtitle>温故而知新</subtitle>
     <logo>https://diuyon.github.io/images/avatar.png</logo>
     <icon>https://diuyon.github.io/favicon.ico</icon>
-    <rights>All rights reserved 2021, Gridea</rights>
+    <rights>All rights reserved 2022, Gridea</rights>
+    <entry>
+        <title type="html"><![CDATA[B树和B+树]]></title>
+        <id>https://diuyon.github.io/post/b-shu-he-bshu/</id>
+        <link href="https://diuyon.github.io/post/b-shu-he-bshu/">
+        </link>
+        <updated>2022-01-09T14:00:04.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="b树和b树">B树和B+树</h1>
+<p>[TOC]</p>
+<blockquote>
+<p>参考：<a href="https://www.cnblogs.com/lianzhilei/p/11250589.html#!comments">B树、B+树详解</a></p>
+</blockquote>
+<h2 id="前言">前言</h2>
+<p>B+ 树是一种存储结构，常用在数据库建立索引。</p>
+<p><strong>准备知识</strong></p>
+<p>m阶的树：树最大分叉有m个，即子节点数最大为m个；</p>
+<p>根节点：没有父节点的节点；</p>
+<p>叶节点：没有子节点的节点；</p>
+<p>内部节点：不是根、叶节点的节点；</p>
+<p>二叉搜索树：左子树中的值要比根节点值 <strong>小</strong>，右子树中的值要比根节点值 <strong>大</strong>；</p>
+<p>平衡二叉树：二叉搜索树的特殊情况，左右子树<strong>高度</strong>一样；</p>
+<h2 id="一-b树">一、B树</h2>
+<p>B数是平衡<strong>多</strong>叉树，一个m阶的B树，有如下特性：</p>
+<ol>
+<li><strong>内部节点最少得有ceil(m/2)个子节点；</strong></li>
+<li>根节点不是叶节点时，至少得有2个子节点，即2阶；</li>
+<li><strong>m阶的节点中包含m-1个数据</strong>；</li>
+<li>所有叶子节点高度一致；</li>
+</ol>
+<figure data-type="image" tabindex="1"><img src="https://segmentfault.com/img/bVcSjVg" alt="B树结构" loading="lazy"></figure>
+<h2 id="二-b树">二、B+树</h2>
+<p>B+树是B树变体，对其规则做了些改变。改变如下：</p>
+<ol>
+<li>叶子结点由一个有序数组和指向其右边一个叶子结点的指针组成；</li>
+<li>非叶子节点由一个有序数组组成，但是数组元素由一个<strong>索引值</strong>一个指针组成；
+<ol>
+<li>指针：指向一个叶子节点；</li>
+<li>索引值：指向的那个叶子节点中最小的索引值；</li>
+</ol>
+</li>
+<li>非叶节点，是工具节点，用于快速找到指定叶节点，只有叶节点才存储真正的数据（一行数据）；</li>
+<li>叶子<strong>节点们</strong>类似一个有序链表;</li>
+<li>m阶的节点中包含m个数据;</li>
+</ol>
+<figure data-type="image" tabindex="2"><img src="https://segmentfault.com/img/bVcSjVi" alt="B+树结构" loading="lazy"></figure>
+<p>注：mysql B+树的叶子结点是一个双链表，且尾部叶子节点还指向头部叶子节点。</p>
+<h3 id="21-为什么b树适合数据库">2.1 为什么B+树适合数据库？</h3>
+<ol>
+<li>B+树便于范围查询，这是最主要的。</li>
+</ol>
+<p>只需要查找最左边范围即可，查到后遍历往右遍历叶子结点，知道碰到右边范围结束，这样就筛出了所有范围内数据。</p>
+<p>B树的范围查找用的是中序遍历，而B+树用的是在链表上遍历；</p>
+<ol start="2">
+<li>B+树的磁盘读写代价更低。</li>
+</ol>
+<p>Mysql最小存储单位为页，每次访问数据都是一页一页加载（访问一页就是一次IO），Mysql的索引树建立自然就是以页为单位，即一个节点就是一页。由于B+树在非叶子节点仅存储索引数据，那么读一页数据，即一次性读入内存中的需要查找的关键字也就越多，相对来说IO读写次数也就降低了；</p>
+<ol start="3">
+<li>B+树查询效率更加稳定</li>
+</ol>
+<p>由于非叶子节点并不是最终指向文件内容的结点，所以任何关键字的查找必须走一条从根结点到叶子结点的路。所有关键字查询的路径长度相同，导致每一个数据的查询效率相当；</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Mysql 的存储单位]]></title>
+        <id>https://diuyon.github.io/post/mysql-de-cun-chu-dan-wei/</id>
+        <link href="https://diuyon.github.io/post/mysql-de-cun-chu-dan-wei/">
+        </link>
+        <updated>2022-01-09T13:57:36.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="mysql-的存储单位">Mysql 的存储单位</h1>
+<blockquote>
+<p>参考：https://baijiahao.baidu.com/s?id=1704133000001183696&amp;wfr=spider&amp;for=pc</p>
+</blockquote>
+<p>[TOC]</p>
+<p>每种存储系统都有自己的存储单位</p>
+<ul>
+<li>数据持久化存储磁盘里，磁盘的最小单元是扇区，一个扇区的大小是 512个字节。</li>
+<li>文件系统的最小单元是块，一个块的大小是 4K。</li>
+<li><strong>InnoDB 存储引擎，有自己的最小单元，称之为页，一个页的大小是 16K。</strong></li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://pics7.baidu.com/feed/9c16fdfaaf51f3de4c79ec71eff64e173b2979f9.png?token=a2a81ccb25105b604dcca3781ff8346d" alt="img" loading="lazy"></figure>
+<p>Mysql 每次读取都是以存储单位去读取，每读取一页就代表一次IO。假如一行数据大小为 1K，那么一次IO就能读取 16K/1K = 16 行数据。</p>
+<h3 id="mysql-查看存储单位大小">Mysql 查看存储单位大小</h3>
+<pre><code class="language-sql">show variables like 'innodb_page_size';
+</code></pre>
+<h3 id="mysql-一张表最多能存放多少行数据">Mysql 一张表最多能存放多少行数据</h3>
+<p>Mysql 为了加快查询速度，会自动为每张表创建一个<strong>聚簇索引</strong>。同样的聚簇索引代表一个 B+树，其<strong>树的每个节点代表一页</strong>。</p>
+<p>我们从根节点开始算，一个节点存储了一个由（主键，指针）组成的数组，主键的类型为 bigint，大小为 8B(64bit)，Mysql 指针大小为 6B，即一个数组元素大小为 8+6=14B，那一个节点存储的数组长度为 16KB/14B=1170，即一个节点最多可容纳1170个子节点。</p>
+<p>Mysql 官方建议一个B+树高度不要超过3，那么高度为3的 B+树能包含 1170 * 1170 个叶子节点。假设现表一行数据量为 1K，那么一个叶子节点可容纳 16 行数据（叶子节点也有指针，但是和1K的数据量比起来可以忽略），那么最后一张表可以包含 1170 * 1170 * 16 = 21902400 行数据。</p>
+<h3 id="如何计算当前表能存放多少数据">如何计算当前表能存放多少数据</h3>
+<p><strong>查看当前表的状态信息</strong></p>
+<pre><code class="language-sql">show table status like 'haha_table'\G
+</code></pre>
+<p>其中 <code>Avg_row_length</code> 代表当前表每行的平均大小，单位B。</p>
+<p><strong>查看表信息</strong></p>
+<pre><code class="language-sql">desc haha_table;
+</code></pre>
+<p>查看主键大小。</p>
+<p>计算结果：(16<em>1024 B / Avg_row_length B) * (16</em>1024 B / primary_key_length B) * (leve - 1)</p>
+<ul>
+<li>Avg_row_length 每行数据大小</li>
+<li>primary_key_length 主键大小</li>
+<li>level 树高度</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[代码设计技巧]]></title>
         <id>https://diuyon.github.io/post/dai-ma-she-ji-ji-qiao/</id>
